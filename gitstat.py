@@ -169,20 +169,14 @@ class FileStat:
                 if words_inserted > EQUIVWORDS_BIB_MAX:
                     words_inserted = EQUIVWORDS_BIB_MAX
         elif self.criteria == 10:
-            if patch_status == 2: # deleeted
-                lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, EQUIVWORDS_FIGURE_VECTOR
-            else: # added or modified
-                lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, EQUIVWORDS_FIGURE_VECTOR, 0
+            lines_inserted, lines_deleted, words_inserted, words_deleted = # deleeted; added or modified
+                (0, 0, 0, EQUIVWORDS_FIGURE_VECTOR) if patch_status == 2 else (0, 0, 0, EQUIVWORDS_FIGURE_VECTOR)
         elif self.criteria == 11:
-            if patch_status == 2: # deleeted
-                lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS
-            else: # added or modified
-                lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS, 0
+            lines_inserted, lines_deleted, words_inserted, words_deleted = # deleeted; added or modified
+                (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS) if patch_status == 2 else (0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS, 0)
         elif self.critera == 12:
-            if patch_status == 2: # deleeted
-                lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY
-            else: # added or modified
-                lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY, 0
+            lines_inserted, lines_deleted, words_inserted, words_deleted = # deleeted; added or modified
+                (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY) if patch_status == 2 else (0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY, 0)
         else:
             lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, 0
         # append data
