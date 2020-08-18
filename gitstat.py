@@ -40,11 +40,8 @@ def clone(url, path, callbacks=None):
     if not os.path.exists(path):
         print('Clone from %s to %s ...' % (url, path), end='')
         repo = git.clone_repository(url, path, callbacks=callbacks)
-        if repo is None:
-            print('failed.')
-            return False
-        print('done.')
-        return True
+        if repo is None:    print('failed.');   return False
+        else:               print('done.');     return True
     else:
         print('The repository has already existed.')
         return True
@@ -101,24 +98,20 @@ def pull(repo, remote_name='origin', branch='master', callbacks=None):
         return False
 
 class Stat:
-    def __init__(self, iquery, n_commits, lines_inserted, lines_deleted, words_inserted, words_deleted):
-        self.iquery = iquery # n-th query
-        self.n_commits = n_commits
+    def __init__(self, iquery, lines_inserted, lines_deleted, words_inserted, words_deleted):
+        self.iquery = iquery # by which query
         self.lines_inserted = lines_inserted
         self.lines_deleted = lines_deleted
         self.words_inserted = words_inserted
         self.words_deleted = words_deleted
     
     def __add__(self, r): # for sum() call
-        return Stat(-1,
-            self.n_commits + r.n_commits,
-            self.lines_inserted + r.lines_inserted,
-            self.lines_deleted + r.lines_deleted,
-            self.words_inserted + r.words_inserted,
-            self.words_deleted + r.words_deleted)
+        return Stat(-1, # -1 if from addition
+            self.lines_inserted + r.lines_inserted, self.lines_deleted + r.lines_deleted,
+            self.words_inserted + r.words_inserted, self.words_deleted + r.words_deleted)
 
     def __iadd__(self, r):
-        self.n_commits += r.n_commits
+        self.iquery = -1 # -1 if from addition
         self.lines_inserted += r.lines_inserted
         self.lines_deleted += r.lines_deleted
         self.words_inserted += r.words_inserted
@@ -126,63 +119,51 @@ class Stat:
         return self
 
 class FileStat:
-    '''xxx
+    '''Statistics of a file
 
-    ...
+    .....
 
-    TODO: deal with renaming a file
+    TODO: deal with renaming
     '''
     def __init__(self, filepath):
-        self.stats = list() # list of Stat
+        self.stats = list() # list of Stat (several stats from multiple queries)
         self.filepath = filepath # use filepath as key
         # ensure criteria for scoring
         fileext = os.splitext(filepath)[1].lower() # fileext always case insensitive
-        if fileext in FILEEXT_TEXT:
-            self.criteria = 0
-        elif fileext in FILEEXT_CODE:
-            self.criteria = 1
-        elif ext in FILEEXT_FIGURE_VECTOR:
-            self.criteria = 10
-        elif ext in FILEEXT_FIGURE_BITMAP_LOSSLESS:
-            self.criteria = 11
-        elif ext in FILEEXT_FIGURE_BITMAP_LOSSY:
-            self.criteria = 12
-        else:
-            self.criteria = -1
+        if fileext in FILEEXT_TEXT:                        self.criteria = 0
+        elif fileext in FILEEXT_CODE:                      self.criteria = 1
+        elif fileextext in FILEEXT_FIGURE_VECTOR:          self.criteria = 10
+        elif fileextext in FILEEXT_FIGURE_BITMAP_LOSSLESS: self.criteria = 11
+        elif fileextext in FILEEXT_FIGURE_BITMAP_LOSSY:    self.criteria = 12
+        else:                                              self.criteria = -1
         
     def parse_append(self, iquery, patch_hunks, patch_status):
         '''Parse a patch in diff (in one commit), and append the stat'''
         if self.criteria == 0 or self.criteria == 1:
             lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, 0
-            for hunk in patch_hunks:
-                for line in hunk.lines:
-                    words_diff = len(re.findall(PATTERN_WORD))
-                    if words_diff > 0: # exclude empty line, whitespace change, single linebreak
-                        if line.origin == '+':
-                            lines_inserted += 1
-                            words_inserted += words_diff
-                        elif line.origin == '-':
-                            lines_deleted += 1
-                            words_deleted += words_diff
-            if self.criteria == 1: # code 
+            for line in (hunk.lines for hunk in patch_hunks):
+                words_diff = len(re.findall(PATTERN_WORD))
+                if words_diff == 0:         continue # exclude empty line, whitespace change, single linebreak
+                if line.origin == '+':      lines_inserted += 1; words_inserted += words_diff
+                elif line.origin == '-':    lines_deleted += 1;  words_deleted += words_diff
+            if self.fileext == '.bib':
                 lines_inserted, lines_deleted, words_deleted = 0, 0, 0
-                if words_inserted > EQUIVWORDS_BIB_MAX:
-                    words_inserted = EQUIVWORDS_BIB_MAX
+                if words_inserted > EQUIVWORDS_BIB_MAX: words_inserted = EQUIVWORDS_BIB_MAX
         elif self.criteria == 10:
             lines_inserted, lines_deleted, words_inserted, words_deleted = # deleeted; added or modified
-                (0, 0, 0, EQUIVWORDS_FIGURE_VECTOR) if patch_status == 2 else (0, 0, 0, EQUIVWORDS_FIGURE_VECTOR)
+                (0, 0, 0, EQUIVWORDS_FIGURE_VECTOR) if patch_status == 2 else (0, 0, 0, 0)
         elif self.criteria == 11:
             lines_inserted, lines_deleted, words_inserted, words_deleted = # deleeted; added or modified
-                (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS) if patch_status == 2 else (0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS, 0)
+                (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS) if patch_status == 2 else (0, 0, 0, 0)
         elif self.critera == 12:
             lines_inserted, lines_deleted, words_inserted, words_deleted = # deleeted; added or modified
-                (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY) if patch_status == 2 else (0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY, 0)
+                (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY) if patch_status == 2 else (0, 0, 0, 0)
         else:
             lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, 0
         # append data
-        self.stats.append(Stat(iquery, 1, lines_inserted, lines_deleted, words_inserted, words_deleted))
+        self.stats.append(Stat(iquery, lines_inserted, lines_deleted, words_inserted, words_deleted))
 
-def make_commit_filter(emails, since, until, fake_commits):
+def _make_commit_filter(emails, since, until, fake_commits):
     '''Create filter function to filter out invalid commits
     '''
     def is_valid_commit(commit):
@@ -201,17 +182,17 @@ class AuthorStat:
         self.labels = info['labels']
         self.diary = info['diary'] if 'diary' in info else None
         # statistics
-        self.case_sensitive = case_sensitive
-        self.files = dict()
+        self.case_sensitive = case_sensitive # whether key to files[] case-sensitive
+        self.files = dict() # dictionary of FileStat
         self.summary = None # Stat() if get_summary(); [Stat() ...] if get_summary(durations=...)
         self.n_commits = 0 # to avoid count repeat commits for different files
         self.queries_with_commits = 0
         self.has_diary = None
 
     def generate_stats(self, repo, commits, since, until, fake_commits, iquery):
-        '''xxxx
+        '''Generate statistics of all the files in the commits of the author
 
-        ...
+        .....
 
         Args:
             repo (pygit2.Repository):
@@ -225,50 +206,61 @@ class AuthorStat:
             ...
         '''
         # get stats of files
-        commit_filter = make_commit_filter(self.emails, since, until, fake_commits)
+        commit_filter = _make_commit_filter(self.emails, since, until, fake_commits)
         filtered_commits = list(filter(commit_filter, commits))
         n_commits = len(filtered_commits)
-        if n_commits > 0:
-            self.n_commits += n_commits
-            self.queries_with_commits += 1
+        if n_commits == 0: return
+        # has some commits
+        self.n_commits += n_commits
+        self.queries_with_commits += 1
         for commit in filtered_commits:
             diff = repo.diff(commit.parents[0], commit)
             for patch in diff:
                 delta = patch.delta
                 filepath = delta.new_file.path if self.case_sensitive else delta.new_files.path.lower()
                 fileext = os.path.splitext()[1].lower() # fileext always case insensitvie
-                if key not in self.files:
-                    self.files[key] = FileStat(key)
+                if filepath not in self.files:
+                    self.files[filepath] = FileStat(filepath)
                 if delta.status > 0 and delta.status < 4: # add, delete, modify (including binary)
-                    self.files[key].parse_append(iquery, patch.hunks, delta.status)
-        return self
+                    self.files[filepath].parse_append(iquery, patch.hunks, delta.status)
 
     def get_summary(self, durations=None):
         if durations is None: # total
-            self.summary = sum([sum(stat) for stat in self.files.values()])
+            self.summary = sum(sum(stat) for stat in self.files.values())
         else: # summary for each duration
-            self.summary = [Stat(-1, 0, 0, 0, 0, 0) for i in range(len(durations))]
-            for stats in self.files.values():
-                for stat in stats:
-                    self.summary[stat.iquery] += stat
+            self.summary = [Stat(-1, 0, 0, 0, 0) for i in range(len(durations))]
+            for stat in (stats for stats in self.files.values()):
+                self.summary[stat.iquery] += stat
         return self.summary
 
-    def check_diary(self, root, durations, check_dir=True, check_file=False, chekc_content=False):
+    def check_diary(self, root, durations, check_file=False, chekc_content=False):
         self.has_diary = [False] * len(durations)
-        if self.diary is None:
-            print('No diary path')
-            return self
-        # check by commit to directory
-        if check_dir:
-            pass
+        if self.diary is None:  print('No diary path'); return
         # check by commit to file
         if check_file:
-            pass
+            key = diary if self.case_sensitive else diary.lower()
+            if key not in self.files:
+                print('No commits to diary')
+            else:
+                for iq in (stat.iquery for stat in self.files[key]):
+                    self.has_diary[iq] = True
         # check by diary content, go through the diary to find datetime
-        if chekc_content:
-            pass
-        # cannot find any relevent commit of files
-        if self.has_diary.count(True) == 0:
-            print('No diary file or no commits to diary')
-        return self
+        if check_content:
+            filepath = os.path.join(root, self.diary)
+            if not os.path.exists(filepath):
+                print('No diary file')
+            else:
+                dates = []
+                with open(path, 'r', encoding='utf-8', errors='replace') as f:
+                    for line in f:
+                        if line.startswith('#'):
+                            try: dates.append(dateutil.parser.parse(line, fuzzy=True).date())
+                            except ValueError: pass # pass if cannot parse date correctly
+                if len(dates) > 0:
+                    duration_dates = ((d[0].date(), d[1].date()) for d in durations) # gen obj
+                    for i, (since, until) in enumerate(duration_dates):
+                        if any((date >= since and date <= util) for date in dates):
+                            self.has_diary[i] = True
+                else:
+                    print('Cannot find any date in diary')
 
