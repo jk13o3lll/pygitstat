@@ -1,3 +1,26 @@
 {
-
+    "title": "Test -- total",
+    "subtitle": "subtitle ...",
+    "note": "Note that merges will not give unfair points.",
+    "url": "https://github/jk13o3lll/pytorch-learning",
+    "repository": "/home/jackwang/Repositories/pytorch-learning/.git",
+    "html": "html/index.html",
+    "weights": {
+        "number of commits": 0.3,
+        "lines inserted": 0.2,
+        "lines deleted": 0.15,
+        "words insreted": 0.2,
+        "words deleted": 0.15
+    },
+    "query type": "total",
+    "queries":[
+        { "name": "Total", "since": "2015-09-08T00:00:00+08:00", "until": "2020-09-14T00:00:00+08:00" }
+    ],
+    "authors": [
+        { "name": "Jack1", "emails": ["jack.wang@nordlinglab.org"], "labels": ["2019"] },
+        { "name": "Jack2", "emails": ["32950120+jk13o3lll@users.noreply.github.com"], "labels": ["2019"] }
+    ],
+    "fake commits": [
+        "6ec05deb10728f364"
+    ]
 }

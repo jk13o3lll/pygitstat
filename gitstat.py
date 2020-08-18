@@ -1,12 +1,12 @@
 import os
 import re # regular expression
 import pygit2 as git
-import dateutil.parser
 from datetime import datetime, timezone, timedelta
+import dateutil.parser
 
 # definition of file extensions (use set)
 # ambiguous: 'ipynb', '.tex', '.bib', '.htm', '.html', ''
-FILEEXT_TXT = {'.md', '.txt', '.tex', ''}
+FILEEXT_TEXT = {'.md', '.txt', '.tex', ''}
 FILEEXT_CODE = {'.m', '.py', '.h', '.c', '.hpp', '.cpp', 'java', '.jl', '.js', '.htm', '.html'}
 FILEEXT_DATA = {'.mat', '.csv', '.dat', '.json', '.xml', '.drawio', '.bib'}
 FILEEXT_BINARY = {'.mlx', '.exe', '.ipynb'}
@@ -66,7 +66,7 @@ def pull(repo, remote_name='origin', branch='master', callbacks=None):
     for remote in repo.remotes:
         if remote.name == remote_name:
             remote.fetch(callbacks=callbacks) # fetch to the remote first
-            remote_master_id = repo.looup_reference('refs/remotes/origin/%s' % (branch)).target # find the branch
+            remote_master_id = repo.lookup_reference('refs/remotes/origin/%s' % (branch)).target # find the branch
             merge_result, _ = repo.merge_analysis(remote_master_id) # auto merge
             if merge_result & git.GIT_MERGE_ANALYSIS_UP_TO_DATE:
                 print('up to date')
@@ -105,11 +105,6 @@ class Stat:
         self.words_inserted = words_inserted
         self.words_deleted = words_deleted
     
-    def __add__(self, r): # for sum() call
-        return Stat(-1, # -1 if from addition
-            self.lines_inserted + r.lines_inserted, self.lines_deleted + r.lines_deleted,
-            self.words_inserted + r.words_inserted, self.words_deleted + r.words_deleted)
-
     def __iadd__(self, r):
         self.iquery = -1 # -1 if from addition
         self.lines_inserted += r.lines_inserted
@@ -129,35 +124,33 @@ class FileStat:
         self.stats = list() # list of Stat (several stats from multiple queries)
         self.filepath = filepath # use filepath as key
         # ensure criteria for scoring
-        fileext = os.splitext(filepath)[1].lower() # fileext always case insensitive
-        if fileext in FILEEXT_TEXT:                        self.criteria = 0
-        elif fileext in FILEEXT_CODE:                      self.criteria = 1
-        elif fileextext in FILEEXT_FIGURE_VECTOR:          self.criteria = 10
-        elif fileextext in FILEEXT_FIGURE_BITMAP_LOSSLESS: self.criteria = 11
-        elif fileextext in FILEEXT_FIGURE_BITMAP_LOSSY:    self.criteria = 12
-        else:                                              self.criteria = -1
+        self.fileext = os.path.splitext(filepath)[1].lower() # fileext always case insensitive
+        if self.fileext in FILEEXT_TEXT:                        self.criteria = 0
+        elif self.fileext in FILEEXT_CODE:                      self.criteria = 1
+        elif self.fileext in FILEEXT_FIGURE_VECTOR:             self.criteria = 10
+        elif self.fileext in FILEEXT_FIGURE_BITMAP_LOSSLESS:    self.criteria = 11
+        elif self.fileext in FILEEXT_FIGURE_BITMAP_LOSSY:       self.criteria = 12
+        else:                                                   self.criteria = -1
         
     def parse_append(self, iquery, patch_hunks, patch_status):
         '''Parse a patch in diff (in one commit), and append the stat'''
         if self.criteria == 0 or self.criteria == 1:
             lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, 0
-            for line in (hunk.lines for hunk in patch_hunks):
-                words_diff = len(re.findall(PATTERN_WORD))
-                if words_diff == 0:         continue # exclude empty line, whitespace change, single linebreak
-                if line.origin == '+':      lines_inserted += 1; words_inserted += words_diff
-                elif line.origin == '-':    lines_deleted += 1;  words_deleted += words_diff
+            for hunk in patch_hunks:
+                for line in hunk.lines:
+                    words_diff = len(re.findall(PATTERN_WORD, line.content))
+                    if words_diff == 0:         continue # exclude empty line, whitespace change, single linebreak
+                    if line.origin == '+':      lines_inserted += 1; words_inserted += words_diff
+                    elif line.origin == '-':    lines_deleted += 1;  words_deleted += words_diff
             if self.fileext == '.bib':
                 lines_inserted, lines_deleted, words_deleted = 0, 0, 0
                 if words_inserted > EQUIVWORDS_BIB_MAX: words_inserted = EQUIVWORDS_BIB_MAX
         elif self.criteria == 10:
-            lines_inserted, lines_deleted, words_inserted, words_deleted = # deleeted; added or modified
-                (0, 0, 0, EQUIVWORDS_FIGURE_VECTOR) if patch_status == 2 else (0, 0, 0, 0)
+            lines_inserted, lines_deleted, words_inserted, words_deleted = (0, 0, 0, EQUIVWORDS_FIGURE_VECTOR) if patch_status == 2 else (0, 0, 0, 0) # deleeted; added or modified
         elif self.criteria == 11:
-            lines_inserted, lines_deleted, words_inserted, words_deleted = # deleeted; added or modified
-                (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS) if patch_status == 2 else (0, 0, 0, 0)
+            lines_inserted, lines_deleted, words_inserted, words_deleted = (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS) if patch_status == 2 else (0, 0, 0, 0)
         elif self.critera == 12:
-            lines_inserted, lines_deleted, words_inserted, words_deleted = # deleeted; added or modified
-                (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY) if patch_status == 2 else (0, 0, 0, 0)
+            lines_inserted, lines_deleted, words_inserted, words_deleted = (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY) if patch_status == 2 else (0, 0, 0, 0)
         else:
             lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, 0
         # append data
@@ -167,29 +160,29 @@ def _make_commit_filter(emails, since, until, fake_commits):
     '''Create filter function to filter out invalid commits
     '''
     def is_valid_commit(commit):
-        t = datetime.fromtimestamp(float(commit.commit_time)),
-                timezone(timedelta(minutes=comit.comit_time_offset)))
+        t = datetime.fromtimestamp(float(commit.commit_time), timezone(timedelta(minutes=commit.commit_time_offset)))
         return (len(commit.parents) == 1 and        # non-merge
-                t > since and t < until             # within duration
-                commit.id not in fake_commits and   # not fake commit
-                commit.committer.email in emails)   # is author
+                t > since and t < until and         # within duration
+                commit.id not in fake_commits and   # not fake commit (set)
+                commit.committer.email in emails)   # is author (set)
     return is_valid_commit
 
-class AuthorStat:
+class Author:
     def __init__(self, info, case_sensitive=True):
         self.name = info['name']
-        self.emails = info['emails']
+        self.emails = set(info['emails'])
         self.labels = info['labels']
         self.diary = info['diary'] if 'diary' in info else None
         # statistics
         self.case_sensitive = case_sensitive # whether key to files[] case-sensitive
         self.files = dict() # dictionary of FileStat
-        self.summary = None # Stat() if get_summary(); [Stat() ...] if get_summary(durations=...)
+        self.summary = None
+        self.summary_duration = None # list of Stat
         self.n_commits = 0 # to avoid count repeat commits for different files
         self.queries_with_commits = 0
         self.has_diary = None
 
-    def generate_stats(self, repo, commits, since, until, fake_commits, iquery):
+    def generate_stats(self, repo, commits, since, until, fake_commits, iquery=0):
         '''Generate statistics of all the files in the commits of the author
 
         .....
@@ -218,20 +211,25 @@ class AuthorStat:
             for patch in diff:
                 delta = patch.delta
                 filepath = delta.new_file.path if self.case_sensitive else delta.new_files.path.lower()
-                fileext = os.path.splitext()[1].lower() # fileext always case insensitvie
+                fileext = os.path.splitext(filepath)[1].lower() # fileext always case insensitvie
                 if filepath not in self.files:
                     self.files[filepath] = FileStat(filepath)
                 if delta.status > 0 and delta.status < 4: # add, delete, modify (including binary)
                     self.files[filepath].parse_append(iquery, patch.hunks, delta.status)
 
-    def get_summary(self, durations=None):
-        if durations is None: # total
-            self.summary = sum(sum(stat) for stat in self.files.values())
-        else: # summary for each duration
-            self.summary = [Stat(-1, 0, 0, 0, 0) for i in range(len(durations))]
-            for stat in (stats for stats in self.files.values()):
-                self.summary[stat.iquery] += stat
-        return self.summary
+    def get_summary(self):
+        # summary for total
+        self.summary = Stat(-1, 0, 0, 0, 0)
+        for filestat in self.files.values():
+            for stat in filestat.stats:
+                self.summary += stat
+    def get_summary_duration(self, durations):
+        # summary for each duration
+        self.summary_duration = [Stat(-1, 0, 0, 0, 0)] * len(durations)
+        for filestat in self.files.values():
+            for stat in filestat.stats:
+                self.summary_duration[stat.iquery] += stat
+        return self.summary_duration
 
     def check_diary(self, root, durations, check_file=False, chekc_content=False):
         self.has_diary = [False] * len(durations)
@@ -242,7 +240,7 @@ class AuthorStat:
             if key not in self.files:
                 print('No commits to diary')
             else:
-                for iq in (stat.iquery for stat in self.files[key]):
+                for iq in [stat.iquery for stat in self.files[key]]:
                     self.has_diary[iq] = True
         # check by diary content, go through the diary to find datetime
         if check_content:
