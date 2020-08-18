@@ -1,2 +1,7 @@
 .vscode
 __pycache__/*
+
+config_*.json
+!config_total.json
+!config_durations.json
+!config_test.json

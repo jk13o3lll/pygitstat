@@ -5,6 +5,8 @@
     "url": "https://github/jk13o3lll/pytorch-learning",
     "clone": "https://github.com/jk13o3lll/pytorch-learning.git", 
     "repository": "/home/jackwang/Repositories/pytorch-learning/.git",
+    "pubkey": "/home/jackwang/.ssh/id_rsa.pub",
+    "privkey": "/home/jackwang/.ssh/id_rsa",
     "html": "html/index.html",
     "export": "pytorch-learning",
     "weights": {
