@@ -1,0 +1,27 @@
+{
+    "title": "Test -- total",
+    "subtitle": "subtitle ...",
+    "note": "Note that merges will not give unfair points.",
+    "url": "https://github/jk13o3lll/robotics",
+    "clone": "https://github.com/jk13o3lll/robotics.git", 
+    "repository": "/home/jackwang/Repositories/robotics/.git",
+    "html": "html/index.html",
+    "export": "test",
+    "weights": {
+        "number of commits": 0.3,
+        "lines inserted": 0.2,
+        "lines deleted": 0.15,
+        "words insreted": 0.2,
+        "words deleted": 0.15
+    },
+    "query type": "total",
+    "queries":[
+        { "name": "Total", "since": "2017-09-08T00:00:00+08:00", "until": "2020-09-14T00:00:00+08:00" }
+    ],
+    "authors": [
+        { "name": "Jack1", "emails": ["       noreply@github.com"], "labels": ["2019"], "author commits": ["c32932b"] }
+    ],
+    "fake commits": [
+        "6ec05deb10728f364"
+    ]
+}

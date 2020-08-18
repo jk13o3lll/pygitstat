@@ -3,8 +3,10 @@
     "subtitle": "subtitle ...",
     "note": "Note that merges will not give unfair points.",
     "url": "https://github/jk13o3lll/pytorch-learning",
+    "clone": "https://github.com/jk13o3lll/pytorch-learning.git", 
     "repository": "/home/jackwang/Repositories/pytorch-learning/.git",
     "html": "html/index.html",
+    "export": "pytorch-learning",
     "weights": {
         "number of commits": 0.3,
         "lines inserted": 0.2,

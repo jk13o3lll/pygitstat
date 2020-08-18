@@ -156,7 +156,7 @@ class FileStat:
         # append data
         self.stats.append(Stat(iquery, lines_inserted, lines_deleted, words_inserted, words_deleted))
 
-def _make_commit_filter(emails, since, until, fake_commits):
+def _make_commit_filter(emails, since, until, author_commits, fake_commits):
     '''Create filter function to filter out invalid commits
     '''
     def is_valid_commit(commit):
@@ -164,15 +164,16 @@ def _make_commit_filter(emails, since, until, fake_commits):
         return (len(commit.parents) == 1 and        # non-merge
                 t > since and t < until and         # within duration
                 commit.id not in fake_commits and   # not fake commit (set)
-                commit.committer.email in emails)   # is author (set)
+                (commit.committer.email in emails or commit.id in author_commits))  # same email or is labelled
     return is_valid_commit
 
 class Author:
-    def __init__(self, info, case_sensitive=True):
+    def __init__(self, info, repo, case_sensitive=True):
         self.name = info['name']
-        self.emails = set(info['emails'])
+        self.emails = set(info['emails']) # if you didn't set the email, github use "noreply@github.com" as default
         self.labels = info['labels']
         self.diary = info['diary'] if 'diary' in info else None
+        self.author_commits = set(repo[rev].id for rev in info['author commits'] if rev in repo) if 'author commits' in info else set() # manual labelled commits
         # statistics
         self.case_sensitive = case_sensitive # whether key to files[] case-sensitive
         self.files = dict() # dictionary of FileStat
@@ -199,7 +200,7 @@ class Author:
             ...
         '''
         # get stats of files
-        commit_filter = _make_commit_filter(self.emails, since, until, fake_commits)
+        commit_filter = _make_commit_filter(self.emails, since, until, self.author_commits, fake_commits)
         filtered_commits = list(filter(commit_filter, commits))
         n_commits = len(filtered_commits)
         if n_commits == 0: return
@@ -223,16 +224,18 @@ class Author:
         for filestat in self.files.values():
             for stat in filestat.stats:
                 self.summary += stat
+        return self.summary
+
     def get_summary_duration(self, durations):
         # summary for each duration
-        self.summary_duration = [Stat(-1, 0, 0, 0, 0)] * len(durations)
+        self.summary_duration = [Stat(-1, 0, 0, 0, 0) for i in range(len(durations))] # [Stat()]*N, all entries will point to same reference
         for filestat in self.files.values():
             for stat in filestat.stats:
                 self.summary_duration[stat.iquery] += stat
         return self.summary_duration
 
     def check_diary(self, root, durations, check_file=False, chekc_content=False):
-        self.has_diary = [False] * len(durations)
+        self.has_diary = [False for i in range(len(durations))]
         if self.diary is None:  print('No diary path'); return
         # check by commit to file
         if check_file:

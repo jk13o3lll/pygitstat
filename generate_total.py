@@ -5,13 +5,14 @@ import dateutil.parser
 
 # load configurations
 with open(sys.argv[1], 'r', encoding='utf-8') as f:
+    # check json first
     config = json.load(f)
-    title = config['title']
-    weights = config['weights']
-    since = dateutil.parser.isoparse(config['queries'][0]['since'])
-    until = dateutil.parser.isoparse(config['queries'][0]['until'])
-    authors = [gitstat.Author(info) for info in config['authors']]
-    repo = git.Repository(config['repository'])
+    assert ('title' in config and 'subtitle' in config and 'note' in config and 
+            'url' in config and 'clone' in config and 'repository' in config and 
+            'html' in config and 'export' in config and 'weights' in config and
+            'query type' in config and 'queries' in config and 'authors' in config), 'Some settings in config file are missing.'
+            # 'pubkey', 'privkey', 'fake commits', 'diary', 'commits' are optional
+    assert config['query type'] == 'total', 'Wrong query type'
     # set credentials
     credentials = None
     if 'pubkey' in config and 'privkey' in config:
@@ -28,11 +29,22 @@ with open(sys.argv[1], 'r', encoding='utf-8') as f:
         password = getpass.getpass('Please input your password: ')
         credentials = git.UserPass(username, password)
         # pygit2 for windows could only use UserPass? cannot use SSH? (allowed = 1)
-    # update
     callbacks = git.RemoteCallbacks(credentials=credentials)
+    # get repo (clone if needed)
+    if not os.path.exists(config['repository']):
+        # path = os.path.dirname(config['repository'])
+        path = config['repository']
+        gitstat.clone(config['clone'], path, callbacks=callbacks)
+    repo = git.Repository(config['repository'])
+    # update
     gitstat.pull(repo, callbacks=callbacks)
-    # get fake commit id
-    fake_commits = set(repo[rev].id for rev in config['fake commits']) if 'fake commits' in config else set()
+    # load from json
+    title = config['title']
+    weights = config['weights']
+    since = dateutil.parser.isoparse(config['queries'][0]['since'])
+    until = dateutil.parser.isoparse(config['queries'][0]['until'])
+    authors = [gitstat.Author(info, repo) for info in config['authors']]
+    fake_commits = set(repo[rev].id for rev in config['fake commits'] if rev in repo) if 'fake commits' in config else set()
 
 # # generate statistics
 commits = [commit for commit in repo.walk(repo.head.target)]
@@ -47,3 +59,4 @@ for author in authors:
         author.summary.words_inserted, author.summary.words_deleted))
 
 # generate html
+# check html folder
