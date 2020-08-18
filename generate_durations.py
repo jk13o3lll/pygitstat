@@ -1,6 +1,6 @@
 import gitstat
 import pygit2 as git
-import sys, os, json, getpass
+import sys, os, json, getpass, datetime
 import dateutil.parser
 
 # load configurations
@@ -69,3 +69,12 @@ for author in authors:
 
 # generate html
 # check html folder
+out = config['html']
+filename, fileext = os.path.splitext(out)
+out_tmp = filename + '_tmp' + ext
+
+
+# check time
+tnow = datetime.now()
+tnow_str = tnow.strftime
+export_name = tnow.str
