@@ -1,12 +1,12 @@
 {
-    "title": "Test -- total",
+    "title": "Test -- durations",
     "subtitle": "subtitle ...",
     "note": "Note that merges will not give unfair points.",
     "url": "https://github/jk13o3lll/pytorch-learning",
     "clone": "https://github.com/jk13o3lll/pytorch-learning.git", 
     "repository": "/home/jackwang/Repositories/pytorch-learning/.git",
-    "pubkey": "/home/jackwang/.ssh/id_rsa.pub",
-    "privkey": "/home/jackwang/.ssh/id_rsa",
+    "--pubkey": "/home/jackwang/.ssh/id_rsa.pub",
+    "--privkey": "/home/jackwang/.ssh/id_rsa",
     "html": "html/index.html",
     "export": "pytorch-learning",
     "weights": {
@@ -16,14 +16,15 @@
         "words insreted": 0.2,
         "words deleted": 0.15
     },
-    "query type": "duration",
+    "query type": "durations",
     "queries":[
-        { "name": "Week 1", "since": "2015-09-08T00:00:00+08:00", "until": "2020-09-14T00:00:00+08:00" },
-        { "name": "Week 2", "since": "2015-09-08T00:00:00+08:00", "until": "2020-09-14T00:00:00+08:00" },
-        { "name": "Week 3", "since": "2020-09-08T00:00:00+08:00", "until": "2020-09-14T00:00:00+08:00" }
+        { "name": "Week 1", "since": "2017-09-08T00:00:00+08:00", "until": "2018-09-14T00:00:00+08:00" },
+        { "name": "Week 2", "since": "2018-09-08T00:00:00+08:00", "until": "2019-09-14T00:00:00+08:00" },
+        { "name": "Week 3", "since": "2019-09-08T00:00:00+08:00", "until": "2020-09-14T00:00:00+08:00" }
     ],
     "authors": [
-        { "name": "Jack1", "emails": ["jack.wang@nordlinglab.org", "32950120+jk13o3lll@users.noreply.github.com"], "labels": ["2019"] }
+        { "name": "Jack1", "emails": ["jack.wang@nordlinglab.org"], "labels": ["2019"] },
+        { "name": "Jack2", "emails": ["noreply@github.com"], "labels": ["2019"] }
     ],
     "fake commits": [
         "6ec05deb10728f364"

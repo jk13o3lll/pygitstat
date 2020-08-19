@@ -245,7 +245,7 @@ class Author:
                 self.summary_duration[stat.iquery] += stat
         return self.summary_duration
 
-    def check_diary(self, root, durations, check_file=False, chekc_content=False):
+    def check_diary(self, root, durations, check_file=False, check_content=False):
         self.has_diary = [False for i in range(len(durations))]
         if self.diary is None:  print('No diary path'); return
         # check by commit to file
