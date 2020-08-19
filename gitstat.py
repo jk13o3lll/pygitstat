@@ -6,7 +6,7 @@ import dateutil.parser
 
 # definition of file extensions (use set)
 # ambiguous: 'ipynb', '.tex', '.bib', '.htm', '.html', ''
-FILEEXT_TEXT = {'.md', '.txt', '.tex', ''}
+FILEEXT_TEXT = {'.md', '.txt', '.tex', '.bib', ''}
 FILEEXT_CODE = {'.m', '.py', '.h', '.c', '.hpp', '.cpp', 'java', '.jl', '.js', '.htm', '.html'}
 FILEEXT_DATA = {'.mat', '.csv', '.dat', '.json', '.xml', '.drawio', '.bib'}
 FILEEXT_BINARY = {'.mlx', '.exe', '.ipynb'}
@@ -21,7 +21,7 @@ PATTERN_WORD = re.compile('(\S+)')
 EQUIVWORDS_FIGURE_VECTOR = 100
 EQUIVWORDS_FIGURE_BITMAP_LOSSLESS = 50
 EQUIVWORDS_FIGURE_BITMAP_LOSSY = 25
-EQUIVWORDS_BIB_MAX = 100 # upper bound every time
+EQUIVWORDS_BIB_MAX = 50 # upper bound every time
 
 def clone(url, path, callbacks=None):
     '''Clone from the repository.
@@ -145,8 +145,8 @@ class FileStat:
         
     def parse_append(self, iquery, patch_hunks, patch_status):
         '''Parse a patch in diff (in one commit), and append the stat'''
+        lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, 0
         if self.criteria == 0 or self.criteria == 1:
-            lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, 0
             for hunk in patch_hunks:
                 for line in hunk.lines:
                     words_diff = len(re.findall(PATTERN_WORD, line.content))
@@ -157,13 +157,11 @@ class FileStat:
                 lines_inserted, lines_deleted, words_deleted = 0, 0, 0
                 if words_inserted > EQUIVWORDS_BIB_MAX: words_inserted = EQUIVWORDS_BIB_MAX
         elif self.criteria == 10:
-            lines_inserted, lines_deleted, words_inserted, words_deleted = (0, 0, 0, EQUIVWORDS_FIGURE_VECTOR) if patch_status == 2 else (0, 0, 0, 0) # deleeted; added or modified
+            words_inserted, words_deleted = (0, EQUIVWORDS_FIGURE_VECTOR) if patch_status == 2 else (EQUIVWORDS_FIGURE_VECTOR, 0) # deleeted; added or modified
         elif self.criteria == 11:
-            lines_inserted, lines_deleted, words_inserted, words_deleted = (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS) if patch_status == 2 else (0, 0, 0, 0)
-        elif self.critera == 12:
-            lines_inserted, lines_deleted, words_inserted, words_deleted = (0, 0, 0, EQUIVWORDS_FIGURE_BITMAP_LOSSY) if patch_status == 2 else (0, 0, 0, 0)
-        else:
-            lines_inserted, lines_deleted, words_inserted, words_deleted = 0, 0, 0, 0
+            words_inserted, words_deleted = (0, EQUIVWORDS_FIGURE_BITMAP_LOSSLESS) if patch_status == 2 else (EQUIVWORDS_FIGURE_BITMAP_LOSSLESS, 0) # deleeted; added or modified
+        elif self.criteria == 12:
+            words_inserted, words_deleted = (0, EQUIVWORDS_FIGURE_BITMAP_LOSSY) if patch_status == 2 else (EQUIVWORDS_FIGURE_BITMAP_LOSSY, 0) # deleeted; added or modified
         # append data
         self.stats.append(Stat(iquery, lines_inserted, lines_deleted, words_inserted, words_deleted))
 
