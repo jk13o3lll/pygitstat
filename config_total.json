@@ -20,7 +20,7 @@
     ],
     "authors": [
         { "name": "Jack1", "emails": ["jack.wang@nordlinglab.org"], "labels": ["2019"] },
-        { "name": "Jack2", "emails": ["32950120+jk13o3lll@users.noreply.github.com"], "labels": ["2019"] }
+        { "name": "Jack2", "emails": ["noreply@github.com"], "labels": ["2019"] }
     ],
     "fake commits": [
         "6ec05deb10728f364"

@@ -1,7 +1,8 @@
 import gitstat
 import pygit2 as git
-import sys, os, json, getpass
+import sys, os, json, getpass, shutil
 import dateutil.parser
+from datetime import datetime
 
 # load configurations
 with open(sys.argv[1], 'r', encoding='utf-8') as f:
@@ -61,7 +62,7 @@ for author in authors:
 # generate html
 out = config['html']
 filename, fileext = os.path.splitext(out)
-out_tmp = filename + '_tmp' + ext
+out_tmp = filename + '_tmp' + fileext
 # check html folder
 dir = os.path.dirname(out)
 if not os.path.exists(dir):
@@ -69,7 +70,7 @@ if not os.path.exists(dir):
 # check time
 tnow = datetime.now()
 tnow_str = tnow.strftime('%Y-%m-%d %H:%M:%S')
-export_name = tnow.str('%Y%m%d_%H%M%S_') + config['export']
+export_name = tnow.strftime('%Y%m%d_%H%M%S_') + config['export']
 # generate html
 with open(out_tmp, 'w', encoding='utf-8') as f:
     # head
@@ -148,7 +149,7 @@ with open(out_tmp, 'w', encoding='utf-8') as f:
                 filepath=fstat.filepath,
                 n_fake_commits=0,
                 n_invalid_commits=0,
-                n_commits='-', # may calculate same commit
+                n_commits='--', # may calculate same commit
                 lines_inserted=tmp.lines_inserted,
                 lines_deleted=tmp.lines_deleted,
                 words_inserted=tmp.words_inserted,
@@ -175,7 +176,7 @@ with open(out_tmp, 'w', encoding='utf-8') as f:
             n_invalid_commits=0,
             n_commits=author.n_commits,
             lines_inserted=author.summary.lines_inserted,
-            lines_deleted=author.lines_deleted,
+            lines_deleted=author.summary.lines_deleted,
             words_inserted=author.summary.words_inserted,
             words_deleted=author.summary.words_deleted,
             git_score=0
@@ -213,8 +214,8 @@ with open(out_tmp, 'w', encoding='utf-8') as f:
                     '$("#statistics").on("click", "td.details-control", function(){{'
                         'var tr = $(this).closest("tr");'
                         'var row = table.row(tr);'
-                        'if(row.child.isShown()){{row.child.hide();tr.removeClass("shown");}}'
-                        'else{{row.child(tr.data("child-value")).show();tr.addClass("shown");}}'
+                        'if(row.child.isShown()){{row.child.hide(); tr.removeClass("shown");}}'
+                        'else{{row.child(tr.data("child-value")).show(); tr.addClass("shown");}}'
                     '}});'
                 '}});'
             '</script>'
@@ -225,7 +226,6 @@ with open(out_tmp, 'w', encoding='utf-8') as f:
         export_name=export_name
     ))
 
-
-    # copy to destination
-    with open(out, 'w', encoding='utf-8') as dst:
-        shutil.copyfileobj(f, dst)
+# copy to destination
+with open(out_tmp, 'r', encoding='utf-8') as src, open(out, 'w', encoding='utf-8') as dst:
+    shutil.copyfileobj(src, dst)

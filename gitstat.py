@@ -111,7 +111,7 @@ class Stat:
             self.lines_inserted + r.lines_inserted, self.lines_deleted + r.lines_deleted,
             self.words_inserted + r.words_inserted, self.words_deleted + r.words_deleted)
 
-    def __radd(self, l): # for beginning of sum(), 0+Stat()
+    def __radd__(self, l): # for beginning of sum(), 0+Stat()
         return Stat(-1,
             self.lines_inserted, self.lines_deleted,
             self.words_inserted, self.words_deleted)

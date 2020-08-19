@@ -10,6 +10,7 @@ body {
 }
 
 header {
+    width: 100vw;
     border: 0px;
     padding: 1px;
     background-color: rgb(50, 50, 50);
@@ -77,7 +78,7 @@ table.dataTable table { /* subtable style */
 
 div.dt-buttons {
     font-family: 'Lemonada', cursive;
-    font-size: 10px;
+    font-size: 12px;
 }
 div.dataTables_length {
     margin-left: 20px;

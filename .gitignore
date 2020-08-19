@@ -5,3 +5,6 @@ config_*.json
 !config_total.json
 !config_durations.json
 !config_test.json
+
+html/*.html
+!nav.html
