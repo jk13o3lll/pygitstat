@@ -7,7 +7,7 @@
     "repository": "/home/jackwang/Repositories/pytorch-learning/.git",
     "--pubkey": "/home/jackwang/.ssh/id_rsa.pub",
     "--privkey": "/home/jackwang/.ssh/id_rsa",
-    "html": "html/index.html",
+    "html": "/home/jackwang/Repositories/gitstat/html/index_duration.html",
     "export": "pytorch-learning",
     "weights": {
         "number of commits": 0.3,

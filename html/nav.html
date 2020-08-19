@@ -1,2 +1,86 @@
 <!-- Navigation page to different statistics -->
-<!-- use flexbox -->
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    margin: 20px;
+    border: 0px;
+    background-color: #404040;
+    color:#f1f1f1;
+    font-family: 'Roboto', 'Noto Serif TC', Arial, sans-serif;
+}
+#logo {
+    max-width: 50vw;
+    max-height: 15vh;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+#title {
+    text-align: center;
+    font-size: 50px;
+    word-wrap: break-word;
+}
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* background-color: DodgerBlue; */
+}
+.flex-container > a {
+    background-color: #f1f1f1;
+    text-decoration: none;
+    margin: 10px;
+    text-align: center;
+    line-height: 75px;
+    width: 90vw;
+    word-wrap: break-word;
+}
+.flex-container > a:hover {
+    /* background-color: #aaaaaa; */
+    opacity:0.5;
+}
+.flex-container > a > h2 {
+    font-size: 25px;
+}
+.flex-container > a > img {
+    width: 90%;
+}
+@media only screen and (min-width: 800px) {
+    #logo {
+        max-width: 80vw;
+        max-height: 20vh;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .flex-container > a {
+        background-color: #f1f1f1;
+        margin: 10px;
+        text-align: center;
+        line-height: 75px;
+        width: 40vw;
+        word-wrap: break-word;
+    }
+}
+</style>
+</head>
+<body>
+
+<img id="logo" src="https://upload.wikimedia.org/wikipedia/commons/1/11/Test-Logo.svg" alt="logo">
+<h1 id="title">GIT Statistics</h1>
+
+<div class="flex-container">
+    <a href="index_total.html">
+        <h2>Statistics (total)</h2>
+        <img src="snapshot_total.jpg" alt="snapshot_total">
+    </a>
+    <a href="index_durations.html">
+        <h2>Statistics (durations)</h2>
+        <img src="snapshot_durations.jpg" alt="snapshot_durations">
+    </a>
+</div>
+
+</body>
+</html>

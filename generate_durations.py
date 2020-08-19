@@ -4,6 +4,8 @@ import sys, os, json, getpass, shutil
 import dateutil.parser
 from datetime import datetime
 
+print(sys.argv[0], 'at', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
 # load configurations
 with open(sys.argv[1], 'r', encoding='utf-8') as f:
     # check json first

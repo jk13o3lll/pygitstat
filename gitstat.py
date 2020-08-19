@@ -182,7 +182,7 @@ class Author:
         self.emails = set(info['emails']) # if you didn't set the email, github use "noreply@github.com" as default
         self.labels = info['labels']
         self.diary = info['diary'] if 'diary' in info else None # list(str)
-        self.author_commits = set(repo[rev].id for rev in info['author commits'] if rev in repo) if 'author commits' in info else set() # manual labelled commits
+        self.author_commits = set(repo[rev].id for rev in info['his commits'] if rev in repo) if 'his commits' in info else set() # manual labelled commits
         # statistics
         self.case_sensitive = case_sensitive # whether key to files[] case-sensitive
         self.files = dict() # dictionary of FileStat
