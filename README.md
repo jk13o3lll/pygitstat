@@ -42,10 +42,10 @@ Python package to generate statistics from git.
 
 ### **To use this tool**
 
-'''
+```
 git clone https://github.com/jk13o3lll/gitstat.git
 pip install python-dateutil, pygit2
-'''
+```
 
 ### **To generate statistics for a long duration**
 
