@@ -11,9 +11,9 @@ Python package to generate statistics from git.
 
 1. Navigation page (logo, title, multiple links)
    
-    Width of screen < 800                |  Width of screen >= 800
-    :-----------------------------------:|:-------------------------------------:
-    ![](media/example_navigation_1.png)  |  ![](media/example_navigation_2.png)
+ Width of screen < 800                |  Width of screen >= 800
+ :-----------------------------------:|:-------------------------------------:
+ ![](media/example_navigation_1.png)  |  ![](media/example_navigation_2.png)
 
 2. Visualization of statistics
    
@@ -23,9 +23,9 @@ Python package to generate statistics from git.
     * Copy, Export (excel, csv) (By DataTables)
     * Search, Sort, Pagination (By DataTables)
    
-    For a long duration             | For multiple durations
-    :------------------------------:|:------------------------------------:
-    ![](media/example_total_1.png)  | ![](media/example_durations_1.png)
+ For a long duration             | For multiple durations
+ :------------------------------:|:------------------------------------:
+ ![](media/example_total_1.png)  | ![](media/example_durations_1.png)
    
 3. Generate statistics (Load settings from a json file)
 
