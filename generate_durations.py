@@ -55,16 +55,19 @@ for author in authors:
         author.generate_stats(repo, commits, since, until, fake_commits, iquery)
     author.get_summary()
     author.get_summary_duration(durations)
-    # author.check_diary(repo_dir, durations, check_file=True, check_content=True)
-    author.check_diary(repo_dir, durations, check_file=False, check_content=False)
-    print('  Total:')
-    print('    NC: %d, L+: %d, L-: %d, W+: %d, W-: %d' % (author.n_commits,
+    author.check_diary(os.path.dirname(repo_dir), durations, check_file=True, check_content=True)
+    # print('  Total:')
+    # print('    NC: %d, L+: %d, L-: %d, W+: %d, W-: %d' % (author.n_commits,
+    #     author.summary.lines_inserted, author.summary.lines_deleted,
+    #     author.summary.words_inserted, author.summary.words_deleted))
+    # print('  Durations:')
+    # for iquery, stat in enumerate(author.summary_duration):
+    #     print('    Query %d: L+: %d, L-: %d, W+: %d, W-: %d' %
+    #         (iquery, stat.lines_inserted, stat.lines_deleted, stat.words_inserted, stat.words_deleted))
+    print('  NC: %d, L+: %d, L-: %d, W+: %d, W-: %d' % (
+        author.n_commits,
         author.summary.lines_inserted, author.summary.lines_deleted,
         author.summary.words_inserted, author.summary.words_deleted))
-    print('  Durations:')
-    for iquery, stat in enumerate(author.summary_duration):
-        print('    Query %d: L+: %d, L-: %d, W+: %d, W-: %d' %
-            (iquery, stat.lines_inserted, stat.lines_deleted, stat.words_inserted, stat.words_deleted))
 
 # generate html
 out = config['html']

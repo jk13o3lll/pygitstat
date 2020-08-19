@@ -181,7 +181,7 @@ class Author:
         self.name = info['name']
         self.emails = set(info['emails']) # if you didn't set the email, github use "noreply@github.com" as default
         self.labels = info['labels']
-        self.diary = info['diary'] if 'diary' in info else None
+        self.diary = info['diary'] if 'diary' in info else None # list(str)
         self.author_commits = set(repo[rev].id for rev in info['author commits'] if rev in repo) if 'author commits' in info else set() # manual labelled commits
         # statistics
         self.case_sensitive = case_sensitive # whether key to files[] case-sensitive
@@ -248,29 +248,31 @@ class Author:
         if self.diary is None:  print('No diary path'); return
         # check by commit to file
         if check_file:
-            key = diary if self.case_sensitive else diary.lower()
-            if key not in self.files:
-                print('No commits to diary')
-            else:
-                for iq in [stat.iquery for stat in self.files[key]]:
-                    self.has_diary[iq] = True
+            for diary in self.diary:
+                key = diary if self.case_sensitive else diary.lower()
+                if key not in self.files:
+                    print('No commits to diary')
+                else:
+                    for stat in self.files[key].stats:
+                        self.has_diary[stat.iquery] = True
         # check by diary content, go through the diary to find datetime
         if check_content:
-            filepath = os.path.join(root, self.diary)
-            if not os.path.exists(filepath):
-                print('No diary file')
-            else:
-                dates = []
-                with open(path, 'r', encoding='utf-8', errors='replace') as f:
-                    for line in f:
-                        if line.startswith('#'):
-                            try: dates.append(dateutil.parser.parse(line, fuzzy=True).date())
-                            except ValueError: pass # pass if cannot parse date correctly
-                if len(dates) > 0:
-                    duration_dates = ((d[0].date(), d[1].date()) for d in durations) # gen obj
-                    for i, (since, until) in enumerate(duration_dates):
-                        if any((date >= since and date <= util) for date in dates):
-                            self.has_diary[i] = True
+            for diary in self.diary:
+                filepath = os.path.join(root, diary)
+                if not os.path.exists(filepath):
+                    print('No diary file:', diary)
                 else:
-                    print('Cannot find any date in diary')
+                    dates = []
+                    with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
+                        for line in f:
+                            if line.startswith('#'):
+                                try: dates.append(dateutil.parser.parse(line, fuzzy=True).date())
+                                except ValueError: pass # pass if cannot parse date correctly
+                    if len(dates) > 0:
+                        duration_dates = ((d[0].date(), d[1].date()) for d in durations) # gen obj
+                        for iquery, (since, until) in enumerate(duration_dates):
+                            if any((date >= since and date <= until) for date in dates):
+                                self.has_diary[iquery] = True
+                    else:
+                        print('Cannot find any date in diary:', diary)
 
