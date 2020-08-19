@@ -1,0 +1,84 @@
+@import url('//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css');
+
+body {
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+    background-color: rgb(245, 245, 245);
+    font-size: 18px;
+    font-family: 'Roboto', 'Noto Serif TC', Arial, sans-serif;
+}
+
+header {
+    border: 0px;
+    padding: 1px;
+    background-color: rgb(50, 50, 50);
+    color: white;
+    text-align: center;
+}
+header h1 {
+    font-size: 36px;
+    font-weight: 100px;
+    margin-bottom: -10px;
+}
+header p {
+    font-size: 12px;
+}
+
+main {
+    padding-left: 4%;
+    padding-right: 4%;
+}
+main h1 {
+    color: rgb(50, 50, 50);
+}
+main p {
+    font-size: 20px;
+}
+
+footer p {
+    padding: 50px;
+}
+
+p#total_authors {
+    text-align: right;
+}
+p#note1 {
+    text-align: center;
+}
+p#note2 {
+    text-align: center;
+}
+
+table { /* table style */
+    font-size: 14px;
+}
+tbody td:not(:first-child) { /* align center except first col */
+    text-align: center;
+}
+.no-diary {
+    color: rgb(230, 50, 10);
+}
+.fake-commit {
+    color: rgb(0, 200, 235);
+}
+
+table.dataTable td.details-control { /* icon for expand subtable */
+    background: url('https://www.datatables.net/examples/resources/details_open.png') no-repeat center center;
+    cursor: pointer;
+}
+table.dataTable tr.shown td.details-control { /* icon for collapse subtable */
+    background: url('https://www.dataTables.net/examples/resources/details_close.png') no-repeat center center;
+}
+table.dataTable table { /* subtable style */
+    width: 100%;
+    font-size: 12px;
+}
+
+div.dt-buttons {
+    font-family: 'Lemonada', cursive;
+    font-size: 10px;
+}
+div.dataTables_length {
+    margin-left: 20px;
+}

@@ -59,4 +59,173 @@ for author in authors:
         author.summary.words_inserted, author.summary.words_deleted))
 
 # generate html
+out = config['html']
+filename, fileext = os.path.splitext(out)
+out_tmp = filename + '_tmp' + ext
 # check html folder
+dir = os.path.dirname(out)
+if not os.path.exists(dir):
+    os.mkdirs(dir)
+# check time
+tnow = datetime.now()
+tnow_str = tnow.strftime('%Y-%m-%d %H:%M:%S')
+export_name = tnow.str('%Y%m%d_%H%M%S_') + config['export']
+# generate html
+with open(out_tmp, 'w', encoding='utf-8') as f:
+    # head
+    f.write((
+        '<!DOCTYPE html>'
+        '<html>'
+        '<head>'
+            '<meta charset="utf-8"/>'
+            '<title>{title}</title>'
+            '<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">'
+            '<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css">'
+            '<link rel="stylesheet" type="text/css" href="./gitstat_style.css">'
+        '</head>'
+        '<body>'
+            '<header>'
+                '<h1>{title}</h1>'
+                '<p>Updated {tnow_str} from the git repository.</p>'
+            '</header>'
+            '<main>'
+                '<h2>{subtitle}</h2>'
+                '<p>{note}</p>'
+    ).format(
+        title=config['title'],
+        tnow_str=tnow_str,
+        subtitle=config['subtitle'],
+        note=config['note']
+    ))
+    # table
+    f.write(
+        '<table id="statistics" class="display">'
+            '<thead><tr>' # table header'
+                '<th></th>' # column for expand / collapse icon
+                '<th>Authors</th>'
+                '<th>Semester</th>'
+                '<th>Fake commits</th>'
+                '<th>Invalid commits</th>'
+                '<th>Valid commits</th>'
+                '<th>Lines inserted</th>'
+                '<th>Lines deleted</th>'
+                '<th>Words inserted</th>'
+                '<th>Words deleted</th>'
+                '<th>Git score</th>'
+            '</tr></thead>'
+            '<tbody>' # table body
+    )
+    for author in authors:
+        # hidden table for stats of files
+        f.write(
+            '<tr data-child-value="<table>' # subtable as child value
+                '<thead><tr>' # subtable header
+                    '<th>File name</th>'
+                    '<th>Fake commits</th>'
+                    '<th>Invalid commits</th>'
+                    '<th>Valid commits</th>'
+                    '<th>Lines inserted</th>'
+                    '<th>Lines deleted</th>'
+                    '<th>Words inserted</th>'
+                    '<th>Words deleted</th>'
+                '</tr></thead>'
+                '<tbody>' # subtable content start
+        )
+        for fstat in author.files.values():
+            tmp = sum(fstat.stats)
+            f.write((
+                '<tr>'
+                '<td>{filepath}</td>'
+                '<td>{n_fake_commits}</td>'
+                '<td>{n_invalid_commits}</td>'
+                '<td>{n_commits}</td>'
+                '<td>{lines_inserted}</td>'
+                '<td>{lines_deleted}</td>'
+                '<td>{words_inserted}</td>'
+                '<td>{words_deleted}</td>'
+                '</tr>'
+            ).format(
+                filepath=fstat.filepath,
+                n_fake_commits=0,
+                n_invalid_commits=0,
+                n_commits='-', # may calculate same commit
+                lines_inserted=tmp.lines_inserted,
+                lines_deleted=tmp.lines_deleted,
+                words_inserted=tmp.words_inserted,
+                words_deleted=tmp.words_deleted
+            ))
+        # statistics for the author
+        f.write((
+            '</tbody></table>">' # end of sub table
+            '<td class="details-control"></td>' # button for expand subtable
+            '<td>{name}</td>'
+            '<td>{label}</td>'
+            '<td>{n_fake_commits}</td>'
+            '<td>{n_invalid_commits}</td>'
+            '<td>{n_commits}</td>'
+            '<td>{lines_inserted}</td>'
+            '<td>{lines_deleted}</td>'
+            '<td>{words_inserted}</td>'
+            '<td>{words_deleted}</td>'
+            '<td>{git_score}</td>'
+        ).format(
+            name=author.name,
+            label=author.labels[0],
+            n_fake_commits=0,
+            n_invalid_commits=0,
+            n_commits=author.n_commits,
+            lines_inserted=author.summary.lines_inserted,
+            lines_deleted=author.lines_deleted,
+            words_inserted=author.summary.words_inserted,
+            words_deleted=author.summary.words_deleted,
+            git_score=0
+        ))
+    f.write(
+            '</tbody>'
+        '</table>'
+    )
+    # footer
+    f.write((
+        '</main>'
+            '<footer>'
+                '<p>{footer}</p>'
+            '</footer>'
+            '<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>'
+            '<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>'
+            '<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>'
+            '<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>'
+            '<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>'
+            '<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>'
+            '<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"></script>'
+            '<script type="text/javascript" charset="utf8">'
+                '$(document).ready(function(){{'
+                    # apply datatable
+                    'var table = $("#statistics").DataTable({{'
+                        'dom: "Blfrtip",' # https://datatables.net/reference/option/dom
+                        'buttons: ['
+                            '"copyHtml5",'
+                            '{{extend: "excelHtml5", title: "{export_name}"}},'
+                            '{{extend: "csvHtml5", title: "{export_name}"}}'
+                        '],'
+                        'iDisplayLength: 100'
+                    '}});'
+                    # click for expand / collapse subtable
+                    '$("#statistics").on("click", "td.details-control", function(){{'
+                        'var tr = $(this).closest("tr");'
+                        'var row = table.row(tr);'
+                        'if(row.child.isShown()){{row.child.hide();tr.removeClass("shown");}}'
+                        'else{{row.child(tr.data("child-value")).show();tr.addClass("shown");}}'
+                    '}});'
+                '}});'
+            '</script>'
+        '</body>'
+        '</html>'
+    ).format(
+        footer='',
+        export_name=export_name
+    ))
+
+
+    # copy to destination
+    with open(out, 'w', encoding='utf-8') as dst:
+        shutil.copyfileobj(f, dst)

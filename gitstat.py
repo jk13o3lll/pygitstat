@@ -104,6 +104,17 @@ class Stat:
         self.lines_deleted = lines_deleted
         self.words_inserted = words_inserted
         self.words_deleted = words_deleted
+        # TODO: with a set of commit_id, it is possible to compute n_commits for each file
+
+    def __add__(self, r): # for sum()
+        return Stat(-1,
+            self.lines_inserted + r.lines_inserted, self.lines_deleted + r.lines_deleted,
+            self.words_inserted + r.words_inserted, self.words_deleted + r.words_deleted)
+
+    def __radd(self, l): # for beginning of sum(), 0+Stat()
+        return Stat(-1,
+            self.lines_inserted, self.lines_deleted,
+            self.words_inserted, self.words_deleted)
     
     def __iadd__(self, r):
         self.iquery = -1 # -1 if from addition
