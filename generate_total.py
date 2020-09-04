@@ -210,7 +210,8 @@ with open(out_tmp, 'w', encoding='utf-8') as f:
                             '{{extend: "excelHtml5", title: "{export_name}"}},'
                             '{{extend: "csvHtml5", title: "{export_name}"}}'
                         '],'
-                        'iDisplayLength: 100'
+                        'iDisplayLength: 100,'
+			'scrollX: true'
                     '}});'
                     # click for expand / collapse subtable
                     '$("#statistics").on("click", "td.details-control", function(){{'
