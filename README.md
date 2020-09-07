@@ -129,7 +129,39 @@ crontab -e
 
 // add the following line in crontab (run at 0:00 and 12:00 every day)
 0 0,12 * * * python /aaa/bbb/generate_total.py /xxx/ooo/config_zzz.json >| /ppp/qqq/rrr.log 2>&1
+
 ```
+
+### Suggest install
+
+Ubuntu libssh2 only 1.18.0
+CentOS 8 only libssh
+Windows doesn't have libssh2
+
+If use CentOS 8
+1. Go to CentOS: https://www.centos.org/
+1. Download DVD1.iso: http://centos.cs.nctu.edu.tw/8.2.2004/isos/x86_64/CentOS-8.2.2004-x86_64-dvd1.iso
+1. Make boot USB: https://wiki.centos.org/HowTos/InstallFromUSBkey
+1. Config static IP (optional): https://linuxconfig.org/rhel-8-configure-static-ip-address
+1. Build SSH server: https://linuxconfig.org/how-to-install-start-and-connect-to-ssh-server-on-fedora-linux
+1. Restrict IP of SSH server: https://www.cyberciti.biz/faq/match-address-sshd_config-allow-root-loginfrom-one_ip_address-on-linux-unix/?fbclid=IwAR17bt6Lvh-E9FF6iMjcj0geTNp4XowvzivDzySbwiOsMdKhoKZFkqLJpv4
+1. Build Nginx server: https://www.footmark.info/linux/centos/centos8-installation-lemp/
+1. If you change root or use virtual host, you should watch out mod and selinux: https://kknews.cc/zh-tw/code/kbj4nkq.html  https://www.nginx.com/blog/using-nginx-plus-with-selinux/?fbclid=IwAR17bt6Lvh-E9FF6iMjcj0geTNp4XowvzivDzySbwiOsMdKhoKZFkqLJpv4
+1. Install development tools (GNU C, GIT, ...): https://linuxconfig.org/install-development-tools-on-redhat-8
+1. Update packages (CMake in devtools, ...): https://blog.xuite.net/tolarku/blog/588694781-%5BCentOS+8%5D+%E5%A5%97%E4%BB%B6%E7%AE%A1%E7%90%86%E5%99%A8+DNF+-+Dandify+YUM
+1. Install libgit2: https://centos.pkgs.org/8/centos-appstream-x86_64/libgit2-0.26.8-1.el8.x86_64.rpm.html
+1. Install libssh2 1.9.0: https://centos.pkgs.org/8/epel-x86_64/libssh2-1.9.0-5.el8.x86_64.rpm.html
+    wget https://download-ib01.fedoraproject.org/pub/epel/8/Everything/x86_64/Packages/l/libssh2-1.9.0-5.el8.x86_64.rpm
+    rpm -Uvh libssh2-1.9.0-5.el8.x86_64.rpm
+    sudo dnf install libssh2
+1. Upgrade pip3: sudo pip3 install --upgrade pip
+1. Build libgit2 from source: https://www.pygit2.org/install.html
+    su
+    pip3 install pygit2
+
+
+* Install libgit2 from source (to ensure OPTION(USE_SSH) is on and compile correctly)?
+
 
 ## Contact
 
