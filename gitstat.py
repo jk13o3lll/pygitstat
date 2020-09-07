@@ -66,6 +66,7 @@ def pull(repo, remote_name='origin', branch='master', callbacks=None):
     for remote in repo.remotes:
         if remote.name == remote_name:
             remote.fetch(callbacks=callbacks) # fetch to the remote first
+            # https://github.com/libgit2/pygit2/blob/master/.travis.sh
             remote_master_id = repo.lookup_reference('refs/remotes/origin/%s' % (branch)).target # find the branch
             merge_result, _ = repo.merge_analysis(remote_master_id) # auto merge
             if merge_result & git.GIT_MERGE_ANALYSIS_UP_TO_DATE:
