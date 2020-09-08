@@ -78,7 +78,7 @@ out_tmp = filename + '_tmp' + fileext
 # check html folder
 dir = os.path.dirname(out)
 if not os.path.exists(dir):
-    os.mkdirs(dir)
+    os.makedirs(dir)
 # check time
 tnow = datetime.now()
 tnow_str = tnow.strftime('%Y-%m-%d %H:%M:%S')

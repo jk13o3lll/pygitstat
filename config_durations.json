@@ -3,10 +3,11 @@
     "subtitle": "subtitle ...",
     "note": "Note that merges will not give unfair points.",
     "url": "https://github/jk13o3lll/pytorch-learning",
-    "clone": "https://github.com/jk13o3lll/pytorch-learning.git", 
+    "clone": "https://github.com/jk13o3lll/pytorch-learning.git",
     "repository": "/home/jackwang/Repositories/pytorch-learning/.git",
     "--pubkey": "/home/jackwang/.ssh/id_rsa.pub",
     "--privkey": "/home/jackwang/.ssh/id_rsa",
+    "--notes1": "If you use pubkey and privkey, please ensure you set correct ssh url to the remote. You can use git remote -v to check and git remote set-url to change.",
     "html": "/home/jackwang/Repositories/gitstat/html/index_duration.html",
     "export": "pytorch-learning",
     "weights": {
