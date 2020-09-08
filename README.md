@@ -4,7 +4,7 @@ Python package to generate statistics from git.
 ## Dependencies
 
 * Python3 (>=3.5) (sys, os, json, getpass, shutil, datetime, re, ...)
-* Python: [pygit2](https://www.pygit2.org/), [python-dateutil](https://dateutil.readthedocs.io/en/stable/)
+* Python: [pygit2](https://www.pygit2.org/), [python-dateutil](https://dateutil.readthedocs.io/en/stable/) >= 2.7
 * Javascript: [DataTables](https://datatables.net/)
 
 ## Features
