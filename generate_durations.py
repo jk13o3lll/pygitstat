@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
+
 import gitstat
 import pygit2 as git
 import sys, os, json, getpass, shutil
